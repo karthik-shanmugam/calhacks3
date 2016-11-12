@@ -15,7 +15,6 @@ def faceArea(dct):
 maxFace = max(result, key=faceArea)
 
 def getEmotions(face):
-	
 	print(rankedEmotions)
 	return rankedEmotions
 
@@ -24,7 +23,6 @@ def getMaxEmotion(face):
 	print(emotionsList)
 	maxEmo = max(emotionsList, key=lambda x: x[1])
 	return maxEmo
-
 
 def dictToList(dct):
 	keys = dct['scores'].keys()
