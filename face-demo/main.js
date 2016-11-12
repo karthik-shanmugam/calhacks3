@@ -6,9 +6,9 @@ $(document).ready(function() {
             document.getElementById('my_result').innerHTML = '<img src="'+data_uri+'"/>';
             $("emotion-img").attr("src", "");
             post("/image", {'image': data_uri}, function(data){
-                // document.getElementById('emotion').innerHTML = data;
+                document.getElementById('temp').innerHTML = data_uri;
                 switch (data) {
-                    case "happines":
+                    case "happiness":
                         $(".emotion-img").attr("src", "emojis/smile.png");
                         break;
                     case "sadness":

@@ -6,6 +6,7 @@ import threading
 import random
 from random import gauss
 import os
+from rapid import classify_image
 
 imgur_client = "0f8ebdce6b83981"
 imgur_secret = "f5b5ca46e0ea44e94b5cc3f6e9ebe4dc4a8aa254"
@@ -46,7 +47,7 @@ def upload_image():
         fh.write(base64.decodestring(bytes(request.form['image'][23:], 'utf-8')))
     link = upload_to_imgur(filename)
     os.remove(filename)
-    emotion = classify_image(link)
+    emotion = classify_image(link)[0]
     return emotion
 
 
@@ -56,13 +57,13 @@ def upload_to_imgur(path):
         myfile.write("%s\n" % link)
     return link
 
-def classify_image(link):
+# def classify_image(link):
 
-    # vec = [gauss(0, 1) for i in range(8)]
-    # mag = sum(x**2 for x in vec) ** .5
-    # vector = {emotion: score for emotion, score in zip(("anger","contempt","disgust","fear","happiness","neutral","sadness","surprise"), [x/mag for x in vec])}
-    return random.choice(["anger","contempt","disgust","fear","happiness","neutral","sadness","surprise"])
-    #return vector
+#     # vec = [gauss(0, 1) for i in range(8)]
+#     # mag = sum(x**2 for x in vec) ** .5
+#     # vector = {emotion: score for emotion, score in zip(("anger","contempt","disgust","fear","happiness","neutral","sadness","surprise"), [x/mag for x in vec])}
+#     return random.choice(["anger","contempt","disgust","fear","happiness","neutral","sadness","surprise"])
+#     #return vector
 
 if __name__ == "__main__":
     app.run(debug=True)
