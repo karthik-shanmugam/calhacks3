@@ -1,6 +1,8 @@
 from rapidconnect import RapidConnect
 rapid = RapidConnect('Emotions', '24aa499b-e5a4-491e-90ce-9bb0f8d75c86');
 import base64
+import json
+import emotion
 # result = rapid.call('MicrosoftEmotionAPI', 'getEmotionRecognition', { 
 #   'subscriptionKey': '90febbecca1c462f871ea1d8e349d76a',
 #   'image': 'http://i.imgur.com/shDtPNc.jpg'
@@ -20,8 +22,8 @@ def getEmotions(face):
 
 def getMaxEmotion(face):
     emotionsList = dictToList(face)
-    print(emotionsList)
     maxEmo = max(emotionsList, key=lambda x: x[1])
+    print(maxEmo)
     return maxEmo
 
 def dictToList(dct):
@@ -35,21 +37,12 @@ def dictToList(dct):
 # print(getMaxEmotion(maxFace))
 
 
-def classify_image(link):
-    result = rapid.call('MicrosoftEmotionAPI', 'getEmotionRecognition', { 
-        'subscriptionKey': '90febbecca1c462f871ea1d8e349d76a',
-        'image': link
-    })
-    print(link)
-    print(result)
-    if result:
-        maxFace = max(result, key=faceArea)
-        return getMaxEmotion(maxFace)
-    else:
-        return "none"
-
 if __name__ == "__main__":
-    with open("images/image16.jpeg", "rb") as image_file:
-        encoded_string = "data:image/jpeg;base64," + str(base64.b64encode(image_file.read()))
-        print(classify_image(encoded_string))
+    lst = emotion.returnData("image16.jpeg").decode('ascii')
+    data = json.loads(lst)
+    maxFace = max(data, key=faceArea)
+    maxEmo = getMaxEmotion(maxFace)
+    #with open("images/image16.jpeg", "rb") as image_file:
+    #    encoded_string = "data:image/jpeg;base64," + str(base64.b64encode(image_file.read()))
+    #    print(classify_image(encoded_string))
 
