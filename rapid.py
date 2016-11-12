@@ -34,14 +34,20 @@ def dictToList(dct):
         tupList.append((key, scores[key]))
     return tupList
 
-# print(getMaxEmotion(maxFace))
+def classifyImages(lst):
+    classifications = []
+    for imageStr in lst:
+        lst = emotion.returnData(imageStr).decode('ascii')
+        data = json.loads(lst)
+        maxFace = max(data, key=faceArea)
+        maxEmo = getMaxEmotion(maxFace)
+        classifications.append(maxEmo)
+    return classifications
 
 
 if __name__ == "__main__":
-    lst = emotion.returnData("image16.jpeg").decode('ascii')
-    data = json.loads(lst)
-    maxFace = max(data, key=faceArea)
-    maxEmo = getMaxEmotion(maxFace)
+    lst = ["images/image1.jpeg", "images/image2.jpeg", "images/image3.jpeg", "images/image4.jpeg", "images/image5.jpeg"]
+    print(classifyImages(lst))
     #with open("images/image16.jpeg", "rb") as image_file:
     #    encoded_string = "data:image/jpeg;base64," + str(base64.b64encode(image_file.read()))
     #    print(classify_image(encoded_string))
