@@ -31,7 +31,8 @@ $(document).ready(function() {
             }, delay + (interval/frames)*i);
         }
         setTimeout(function() {
-            post("/images", {'images': JSON.stringify(images), 'content':'http://i.imgur.com/gUHZXOh.jpg'}, function(data){
+            post("/images", {'images': JSON.stringify(images), 'content':$('.content').attr("src")}, function(data){
+                console.log(data);
                 switch (data) {
                     case "happiness":
                         $(".emotion-img").attr("src", "emojis/smile.png");
@@ -49,7 +50,7 @@ $(document).ready(function() {
     }
 
     $(".snap").click(function() {
-        collect_snapshots(500, 500, 2);
+        collect_snapshots(500, 500, 3);
     });
     $(".suggest").click(function() {
         post("/suggestion", {"url": $(".suggestion").val()}, function(data) {
@@ -58,6 +59,15 @@ $(document).ready(function() {
             }
         })
     })
+
+    function get_content() {
+        $.get("content", function( data ) {
+          $(".content").attr("src", data) ;
+        });
+    }
+
+    $(".get-content").click(get_content);
+
     function post(path, parameters, callback) {
         var form = $('<form></form>');
 

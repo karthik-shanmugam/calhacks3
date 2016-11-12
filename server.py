@@ -6,7 +6,7 @@ import threading
 import random
 from random import gauss
 import os
-from rapid import classify_image
+from rapid import overall_classification
 import pickle
 
 from collections import Counter, defaultdict
@@ -42,9 +42,7 @@ app = Flask(__name__, static_url_path='')
 def root():
     return send_from_directory('face-demo', 'index.html')
 
-@app.route('/<string:path>', methods=['GET'])
-def static_proxy(path):
-    return send_from_directory('face-demo', path)
+
 
 @app.route('/emojis/<string:path>', methods=['GET'])
 def static_proxy2(path):
@@ -54,28 +52,36 @@ def static_proxy2(path):
 counter = 0
 counter_lock = threading.Lock()
 
-@app.route('/image', methods=['POST'])
-def upload_image():
-    #print(request.form['image'])
-    global counter
-    with counter_lock:
-        filename = "images/image%d.jpeg" % counter
-        counter += 1
-    with open(filename, "wb") as fh:
-        fh.write(base64.decodestring(bytes(request.form['image'][23:], 'utf-8')))
-    link = upload_to_imgur(filename)
-    os.remove(filename)
-    emotion = classify_image(link)[0]
-    return emotion
+# @app.route('/image', methods=['POST'])
+# def upload_image():
+#     #print(request.form['image'])
+#     global counter
+#     with counter_lock:
+#         filename = "images/image%d.jpeg" % counter
+#         counter += 1
+#     with open(filename, "wb") as fh:
+#         fh.write(base64.decodestring(bytes(request.form['image'][23:], 'utf-8')))
+#     link = upload_to_imgur(filename)
+#     os.remove(filename)
+#     emotion = classify_image(link)[0]
+#     return emotion
+
+
+@app.route('/content', methods=['GET'])
+def serve_content():
+    return random.choice(tuple(image_set))
+
 
 @app.route('/images', methods=['POST'])
 def upload_images():
     #print(request.form['image'])
     global counter
-
+    print("flag0")
     images = json.loads(request.form['images'])
     content = request.form['content']
     filenames = []
+    print("flag1")
+
     for image in images:
         with counter_lock:
             filename = "images/image%d.jpeg" % counter
@@ -83,10 +89,19 @@ def upload_images():
         with open(filename, "wb") as fh:
             fh.write(base64.decodestring(bytes(image[23:], 'utf-8')))
         filenames.append(filename)
-    result = classify_images(filenames)
+    print("flag2")
+
+    result = overall_classification(filenames)
+    print("flag3")
+
     if result:
         image_reactions[content][result] += 1
-    return 'ok'
+        cache_reactions()
+        print(image_reactions)
+        print(result)
+        return result
+    else:
+        return "none"
         # link = upload_to_imgur(filename)
         # os.remove(filename)
         # emotion = classify_image(link)[0]
@@ -109,7 +124,9 @@ def suggest_image():
     except Exception as error:
         print("%s is not a valid image!!!" % url)
         return "failure"       
-
+@app.route('/<string:path>', methods=['GET'])
+def static_proxy(path):
+    return send_from_directory('face-demo', path)
 # def upload_to_imgur(path):
 #     link = client.upload_from_path(path)['link']
 #     with open("links.txt", "a") as myfile:
