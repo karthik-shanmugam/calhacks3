@@ -22,8 +22,42 @@ $(document).ready(function() {
         });
     }
 
-    $(".snap").click(take_snapshot);
+    function collect_snapshots(delay, interval, frames) {
+        images = [];
+        for (i = 0; i < frames; i++) { 
+            setTimeout(function(){
+                console.log("snap!!!");
+                Webcam.snap(function(data_uri) {images.push(data_uri);});
+            }, delay + (interval/frames)*i);
+        }
+        setTimeout(function() {
+            post("/images", {'images': JSON.stringify(images), 'content':'http://i.imgur.com/gUHZXOh.jpg'}, function(data){
+                switch (data) {
+                    case "happiness":
+                        $(".emotion-img").attr("src", "emojis/smile.png");
+                        break;
+                    case "sadness":
+                        $(".emotion-img").attr("src", "emojis/frown.png");
+                        break;
+                    default:
+                        $(".emotion-img").attr("src", "emojis/neutral.png");
+                }       
+                console.log(data);
+            });            
+        }, delay+interval+200);
+  
+    }
 
+    $(".snap").click(function() {
+        collect_snapshots(500, 500, 2);
+    });
+    $(".suggest").click(function() {
+        post("/suggestion", {"url": $(".suggestion").val()}, function(data) {
+            if (data == "failure") {
+                alert("suggested image was invalid!");
+            }
+        })
+    })
     function post(path, parameters, callback) {
         var form = $('<form></form>');
 
@@ -43,7 +77,7 @@ $(document).ready(function() {
         // The form needs to be a part of the document in
         // order for us to be able to submit it.
         $.ajax({
-            url:'/image',
+            url:path,
             type:'post',
             data:form.serialize(),
             success:callback

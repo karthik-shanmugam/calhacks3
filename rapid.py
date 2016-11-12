@@ -50,6 +50,6 @@ def classify_image(link):
 
 if __name__ == "__main__":
     with open("images/image16.jpeg", "rb") as image_file:
-        encoded_string = "data:image/jpeg;base64," + str(base64.b64encode(image_file.read()))
+        encoded_string = image_file.read()
         print(classify_image(encoded_string))
 
