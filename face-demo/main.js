@@ -1,26 +1,6 @@
 $(document).ready(function() {
     Webcam.attach( '#my_camera' );
-
-    function take_snapshot() {
-        Webcam.snap( function(data_uri) {
-            document.getElementById('my_result').innerHTML = '<img src="'+data_uri+'"/>';
-            $("emotion-img").attr("src", "");
-            post("/image", {'image': data_uri}, function(data){
-                document.getElementById('temp').innerHTML = data_uri;
-                switch (data) {
-                    case "happiness":
-                        $(".emotion-img").attr("src", "emojis/smile.png");
-                        break;
-                    case "sadness":
-                        $(".emotion-img").attr("src", "emojis/frown.png");
-                        break;
-                    default:
-                        $(".emotion-img").attr("src", "emojis/neutral.png");
-                }       
-                console.log(data);
-            });
-        });
-    }
+    autoplay_interval = "empty";
 
     function collect_snapshots(delay, interval, frames) {
         images = [];
@@ -42,29 +22,48 @@ $(document).ready(function() {
                         break;
                     default:
                         $(".emotion-img").attr("src", "emojis/neutral.png");
-                }       
-                console.log(data);
+                }
             });            
         }, delay+interval+200);
   
     }
 
     $(".snap").click(function() {
-        collect_snapshots(500, 500, 3);
+        collect_snapshots(1500, 2000, 5);
     });
+
+    $(".autoplay").click(function() {
+        $(this).toggleClass("btn-success");
+        $(this).toggleClass("btn-warning");
+        $(this).toggleClass("play");
+        $(this).find("span").toggleClass("glyphicon-play");
+        $(this).find("span").toggleClass("glyphicon-pause");
+
+        if (!$(this).hasClass("play")) {
+            autoplay_interval = setInterval(get_content, 8000);
+            get_content();
+        } else {
+            if (autoplay_interval != "empty") {
+                clearInterval(autoplay_interval);
+            }
+        }
+    });
+
     $(".suggest").click(function() {
         post("/suggestion", {"url": $(".suggestion").val()}, function(data) {
             if (data == "failure") {
-                alert("suggested image was invalid!");
+                //alert("suggested image was invalid!");
             }
         })
     })
 
     function get_content() {
         $.get("content", function( data ) {
-          $(".content").attr("src", data) ;
+          $(".content").attr("src", data);
+          $(".snap").click();
         });
     }
+
 
     $(".get-content").click(get_content);
 
